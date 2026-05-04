@@ -51,14 +51,22 @@ class WebBuilderParityTests(unittest.TestCase):
         self.assertIn('const zipFiles = await fetchReleaseZipFiles(rz);', self.source)
 
     def test_p0824_card_is_web_buildable_with_pages_payload_link(self):
-        p0824_start = self.source.index('{ id: "google-earth-p0824-deploy"')
-        p0824_end = self.source.index('{ id: "google-earth-p0824-restore"', p0824_start)
-        p0824_card = self.source[p0824_start:p0824_end]
+        manifest = (REPO_ROOT / 'docs' / 'app' / 'manifest.json').read_text(encoding='utf-8')
 
-        self.assertNotIn('cliOnly: true', p0824_card)
+        self.assertIn('payloadUrl: meta.release_zip?.web_url || meta.prebuilt_zip || null', self.source)
+        self.assertIn('cliOnly: meta.web_build === false', self.source)
         self.assertIn(
-            'payloadUrl: "https://dspl1236.github.io/MMI3G-Toolkit/payloads/gemmi_p0824_eu_vw.zip"',
-            p0824_card,
+            'https://dspl1236.github.io/MMI3G-Toolkit/payloads/gemmi_p0824_eu_vw.zip',
+            manifest,
+        )
+
+    def test_module_cards_are_manifest_driven(self):
+        self.assertNotIn('const MODULES_DISPLAY = [', self.source)
+        self.assertIn('displayModulesFromManifest(manifest)', self.source)
+        self.assertIn('runScriptOptions: meta.run_script_options || []', self.source)
+        self.assertIn(
+            '...m.runScriptOptions.map(opt => React.createElement("option"',
+            self.source,
         )
 
 

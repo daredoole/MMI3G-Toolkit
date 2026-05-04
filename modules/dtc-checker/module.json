@@ -1,0 +1,23 @@
+{
+    "name": "dtc-checker",
+    "version": "0.1.0-alpha",
+    "description": "Onboard diagnostic trouble code reader for GEM using DSI namespace 2 IOC diagnostic data.",
+    "author": "dspl1236",
+    "status": "tested",
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
+    "prereq": "gem-activator",
+    "screens": [
+        "ToolkitDTC.esd - DTC overview, detail, and control screens"
+    ],
+    "notes": "GEM screen module only. Installs ToolkitDTC.esd and relies on existing IOC diagnostic data exposed through DSI namespace 2.",
+    "display": true,
+    "display_order": 80,
+    "display_name": "DTC Checker",
+    "category": "gem",
+    "short_description": "Onboard diagnostic trouble code reader — view and clear DTCs from the GEM",
+    "detail": "3 GEM screens: DTC overview (20 rows), single DTC detail with status flags, and DTC control (clear/test). Uses DSI namespace 2 via IOC. V850 IOC has TP2.0 diagnostic protocol support."
+}

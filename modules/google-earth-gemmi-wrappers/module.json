@@ -17,5 +17,11 @@
         "Does NOT modify lsd.jxe or firmware",
         "Tested on a US RNS-850 (HN+_US_VW_P0738) after donor GEMMI deployment."
     ],
-    "uninstall": "Use build_sd.py --uninstall to remove /mnt/efs-system/scripts/GEMMI/, or delete that script directory manually."
+    "uninstall": "Use build_sd.py --uninstall to remove /mnt/efs-system/scripts/GEMMI/, or delete that script directory manually.",
+    "display": true,
+    "display_order": 150,
+    "display_name": "GEMMI Wrappers",
+    "category": "system",
+    "short_description": "Install legacy /scripts/GEMMI controls expected by the OEM Google Earth screen",
+    "detail": "Installs shell wrappers for activate/deactivate/start/stop/cache controls that forward to the deployed /mnt/nav/gemmi runtime."
 }

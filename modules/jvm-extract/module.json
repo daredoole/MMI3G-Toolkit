@@ -4,7 +4,11 @@
     "description": "Extract J9 JVM runtime, UI framework JARs, and application config for offline reverse engineering — the first step toward custom MMI menu entries",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "jvm_extract.sh",
     "installs_to_flash": false,
@@ -22,5 +26,11 @@
         "gem/ - All existing .esd screen definitions",
         "jxe-analysis/ - Extracted strings: bundle config, class names, CAN refs, menu structure"
     ],
-    "notes": "Read-only operation — copies files to SD card, changes nothing on the MMI. Output is ~30-50MB depending on firmware. The jxe-analysis folder contains pre-extracted strings from lsd.jxe highlighting bundle registration, Java class names, CAN/vehicle data references, and menu/screen structure — no decompiler needed for initial reconnaissance. IMPORTANT timing caveat: several binaries under /mnt/ifs-root/usr/apps/ (including MMI3GApplication) become invisible to the shell ~3 minutes after boot. For full results, insert the SD card BEFORE powering on or within the first 90 seconds. The script probes for this and warns in the log if run too late. For a timing-independent alternative, use tools/inflate_ifs.py on a firmware MU update's ifs-root.ifs."
+    "notes": "Read-only operation — copies files to SD card, changes nothing on the MMI. Output is ~30-50MB depending on firmware. The jxe-analysis folder contains pre-extracted strings from lsd.jxe highlighting bundle registration, Java class names, CAN/vehicle data references, and menu/screen structure — no decompiler needed for initial reconnaissance. IMPORTANT timing caveat: several binaries under /mnt/ifs-root/usr/apps/ (including MMI3GApplication) become invisible to the shell ~3 minutes after boot. For full results, insert the SD card BEFORE powering on or within the first 90 seconds. The script probes for this and warns in the log if run too late. For a timing-independent alternative, use tools/inflate_ifs.py on a firmware MU update's ifs-root.ifs.",
+    "display": true,
+    "display_order": 110,
+    "display_name": "JVM Extract",
+    "category": "diag",
+    "short_description": "Extract J9 JVM and UI framework for reverse engineering",
+    "detail": "Copies J9 runtime and AppDevelopment.jar to SD for offline analysis."
 }

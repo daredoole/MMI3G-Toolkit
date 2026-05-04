@@ -1,5 +1,5 @@
 {
-    "generated": "2026-05-02",
+    "generated": "2026-05-04",
     "branch": "main",
     "raw_url_base": "https://raw.githubusercontent.com/dspl1236/MMI3G-Toolkit/main/",
     "core_files": {
@@ -16,8 +16,16 @@
         "can-diag": {
             "status": "alpha",
             "description": "CAN bus diagnostics via NDR \u2014 v3 with correct devctl codes (class=5, cmd=7/8 from NavigationNdrInfo disassembly). Probes devctl format, scans ~25 ECU module addresses, reads fault codes, module info, and live sensor data. READ-ONLY \u2014 no writes to vehicle systems.",
+            "display": false,
+            "display_order": null,
+            "display_name": "CAN Diagnostics",
+            "category": "diag",
+            "short_description": "CAN bus diagnostics via NDR \u2014 read-only vehicle probing.",
+            "detail": "CAN bus diagnostics via NDR \u2014 read-only vehicle probing.",
+            "primary": false,
             "standalone": true,
             "run_script": "can_diag.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -42,7 +50,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1311
+                    "size": 1611
                 },
                 {
                     "path": "scripts/can_diag.sh",
@@ -73,8 +81,16 @@
         "can-scanner": {
             "status": "ready",
             "description": "CAN bus / namespace address scanner - discovers what vehicle data is available via GEM key-value polling on your specific MMI3G system",
+            "display": true,
+            "display_order": 70,
+            "display_name": "CAN Scanner",
+            "category": "diag",
+            "short_description": "CAN bus address scanner \u2014 discover RPM, boost, coolant, speed",
+            "detail": "Live address scan via per3 namespace. Great for discovering custom data for gauges dashboard.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -131,7 +147,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1449
+                    "size": 1787
                 },
                 {
                     "path": "scripts/scan_log.sh",
@@ -150,8 +166,16 @@
         "diag-tool": {
             "status": "alpha",
             "description": "UDS diagnostic scanner for VAG modules \u2014 simulated transport + full UDS client (alpha). Live mode requires external VAG-COM interface (VCDS HEX, VNCI 6154a). Installed as a Java JAR artifact; no GEM screens.",
+            "display": true,
+            "display_order": 190,
+            "display_name": "Diag Tool",
+            "category": "diag",
+            "short_description": "UDS diagnostic scanner \u2014 needs VAG-COM cable",
+            "detail": "Auto-scans modules, reads/clears DTCs. Alpha \u2014 requires external diagnostic hardware.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": "diag-tool.jar",
             "payload_dirs": [],
             "release_zip": null,
@@ -172,7 +196,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1021
+                    "size": 1335
                 },
                 {
                     "path": "src/de/audi/mmi3g/diag/DiagApp.java",
@@ -215,8 +239,16 @@
         "dns-refresh-probe": {
             "status": "alpha",
             "description": "One-shot network diagnostic that snapshots route/DNS state, rewrites /etc/resolv.conf to a better DNS candidate, and reruns connectivity checks.",
+            "display": true,
+            "display_order": 180,
+            "display_name": "DNS Refresh Probe",
+            "category": "net",
+            "short_description": "One-shot route/DNS diagnostic and temporary /etc/resolv.conf refresh",
+            "detail": "Snapshots route and DNS state, backs up /etc/resolv.conf to SD, rewrites nameserver to /dns-refresh-target.txt override or the default gateway, then reruns connectivity checks.",
+            "primary": false,
             "standalone": true,
             "run_script": "dns_refresh_probe.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -232,7 +264,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 1006
+                    "size": 1430
                 },
                 {
                     "path": "scripts/dns_refresh_probe.sh",
@@ -240,11 +272,60 @@
                 }
             ]
         },
+        "dtc-checker": {
+            "status": "tested",
+            "description": "Onboard diagnostic trouble code reader for GEM using DSI namespace 2 IOC diagnostic data.",
+            "display": true,
+            "display_order": 80,
+            "display_name": "DTC Checker",
+            "category": "gem",
+            "short_description": "Onboard diagnostic trouble code reader \u2014 view and clear DTCs from the GEM",
+            "detail": "3 GEM screens: DTC overview (20 rows), single DTC detail with status flags, and DTC control (clear/test). Uses DSI namespace 2 via IOC. V850 IOC has TP2.0 diagnostic protocol support.",
+            "primary": false,
+            "standalone": false,
+            "run_script": null,
+            "run_script_options": [],
+            "artifact": null,
+            "payload_dirs": [],
+            "release_zip": null,
+            "release_assets": null,
+            "web_build": true,
+            "prebuilt_zip": null,
+            "script_dir": "/scripts/dtc-checker",
+            "installs_to_flash": true,
+            "compatible": [
+                "MMI3G",
+                "MMI3G+",
+                "RNS-850"
+            ],
+            "files": [
+                {
+                    "path": "README.md",
+                    "size": 2273
+                },
+                {
+                    "path": "engdefs/ToolkitDTC.esd",
+                    "size": 1913
+                },
+                {
+                    "path": "module.json",
+                    "size": 975
+                }
+            ]
+        },
         "game-loader": {
             "status": "ready",
             "description": "Java game launcher for MMI3G \u2014 run games from SD card on the J9 JVM. Use SD slot 2 as your game library!",
+            "display": true,
+            "display_order": 120,
+            "display_name": "Game Loader",
+            "category": "visual",
+            "short_description": "Run Java games on the MMI's J9 JVM from SD card",
+            "detail": "Launcher module plus example games. Loads signed JARs via the built-in job framework.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -305,7 +386,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1374
+                    "size": 1691
                 },
                 {
                     "path": "scripts/game_install.sh",
@@ -324,8 +405,16 @@
         "gauges-dashboard": {
             "status": "ready",
             "description": "Live vehicle telemetry dashboard - battery voltage, GPS status, system info with data logging to SD card",
+            "display": true,
+            "display_order": 30,
+            "display_name": "Gauges Dashboard",
+            "category": "gem",
+            "short_description": "Live telemetry \u2014 voltage, GPS, system info, data logging",
+            "detail": "3 GEM screens with 500ms battery polling, GPS satellite tracking, and one-tap data logging to SD card.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -354,7 +443,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1029
+                    "size": 1375
                 },
                 {
                     "path": "scripts/diskinfo.sh",
@@ -397,8 +486,16 @@
         "gem-activator": {
             "status": "ready",
             "description": "Enable/disable the Green Engineering Menu from SD card \u2014 creates /HBpersistence/DBGModeActive. No VCDS needed!",
+            "display": true,
+            "display_order": 20,
+            "display_name": "GEM Activator",
+            "category": "system",
+            "short_description": "Enable the Green Engineering Menu from SD card \u2014 creates /HBpersistence/DBGModeActive.",
+            "detail": "Creates the DBGModeActive file marker checked by the MMI firmware at boot. Reboot after running to activate GEM.",
+            "primary": false,
             "standalone": true,
             "run_script": "gem_enable.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -427,7 +524,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 986
+                    "size": 1372
                 },
                 {
                     "path": "scripts/gem_disable.sh",
@@ -446,8 +543,16 @@
         "gemmi-dump": {
             "status": "ready",
             "description": "Extract GEMMI (Google Earth) binaries and config from HDD for offline analysis \u2014 needed for auth bypass patching",
+            "display": true,
+            "display_order": 130,
+            "display_name": "GEMMI Dump",
+            "category": "diag",
+            "short_description": "Extract Google Earth binaries from HDD for offline analysis and patching",
+            "detail": "Copies gemmi_final, libembeddedearth.so, and all GEMMI config/scripts to SD card. Needed for offline Google Earth reverse engineering.",
+            "primary": false,
             "standalone": true,
             "run_script": "gemmi_dump.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -464,7 +569,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 624
+                    "size": 1012
                 },
                 {
                     "path": "scripts/gemmi_dump.sh",
@@ -475,8 +580,33 @@
         "google-earth": {
             "status": "tested",
             "description": "Google Earth satellite imagery restoration \u2014 CONFIRMED WORKING. On-car proxy serves dbRoot + auth locally, forwards tiles to kh.google.com via plain HTTP. No PC required.",
+            "display": true,
+            "display_order": 140,
+            "display_name": "Google Earth",
+            "category": "system",
+            "short_description": "Google Earth satellite imagery \u2014 live tiles from Google's servers",
+            "detail": "Restores Google Earth satellite imagery to MMI3G+ head units. Deploys an on-car proxy that serves map data directly from Google's tile servers. Requires working internet via LTE, Wi-Fi tethering, USB Ethernet, or equivalent.",
+            "primary": false,
             "standalone": true,
             "run_script": "ge_deploy.sh",
+            "run_script_options": [
+                {
+                    "value": "ge_deploy_oncar.sh",
+                    "label": "Deploy (install Google Earth)"
+                },
+                {
+                    "value": "ge_deploy_v6.sh",
+                    "label": "Deploy (v6 StreetView Test)"
+                },
+                {
+                    "value": "ge_probe.sh",
+                    "label": "Probe (safe, read-only)"
+                },
+                {
+                    "value": "ge_restore.sh",
+                    "label": "Restore (revert all changes)"
+                }
+            ],
             "artifact": null,
             "payload_dirs": [
                 {
@@ -497,7 +627,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 2124
+                    "size": 3049
                 },
                 {
                     "path": "payload/auth_resp1.bin",
@@ -580,8 +710,16 @@
         "google-earth-gemmi-wrappers": {
             "status": "alpha",
             "description": "Install legacy /scripts/GEMMI control-script wrappers so the OEM GoogleEarth GEM screen can call the donor GEMMI runtime already deployed under /mnt/nav/gemmi/.",
+            "display": true,
+            "display_order": 150,
+            "display_name": "GEMMI Wrappers",
+            "category": "system",
+            "short_description": "Install legacy /scripts/GEMMI controls expected by the OEM Google Earth screen",
+            "detail": "Installs shell wrappers for activate/deactivate/start/stop/cache controls that forward to the deployed /mnt/nav/gemmi runtime.",
+            "primary": false,
             "standalone": true,
             "run_script": "gemmi_wrapper_install.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -596,7 +734,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 923
+                    "size": 1285
                 },
                 {
                     "path": "scripts/activateGEMMI.sh",
@@ -639,8 +777,16 @@
         "google-earth-p0824-deploy": {
             "status": "alpha",
             "description": "Deploy the bundled EU VW P0824 GEMMI donor payload to /mnt/nav/gemmi with on-car backup and minimal drivers.ini auth-bypass patching. SD-card only; does not modify lsd.jxe or firmware.",
+            "display": true,
+            "display_order": 160,
+            "display_name": "P0824 GEMMI Deploy",
+            "category": "system",
+            "short_description": "Deploy bundled EU VW P0824 GEMMI donor payload to /mnt/nav/gemmi",
+            "detail": "Backs up the existing /mnt/nav/gemmi tree, copies the bundled EU VW P0824 GEMMI payload from SD card root /gemmi, and adds minimal drivers.ini auth-bypass settings. Does not patch lsd.jxe or firmware.",
+            "primary": false,
             "standalone": true,
             "run_script": "ge_p0824_deploy.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [
                 {
@@ -689,7 +835,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1621
+                    "size": 2047
                 },
                 {
                     "path": "scripts/ge_p0824_deploy.sh",
@@ -700,8 +846,16 @@
         "google-earth-p0824-restore": {
             "status": "alpha",
             "description": "Restore /mnt/nav/gemmi to the pre-deploy state saved by google-earth-p0824-deploy. SD-card only; does not touch firmware.",
+            "display": true,
+            "display_order": 170,
+            "display_name": "P0824 GEMMI Restore",
+            "category": "system",
+            "short_description": "Restore /mnt/nav/gemmi from the backup made by P0824 GEMMI Deploy",
+            "detail": "Uses /mnt/nav/.mmi3g_toolkit/google-earth-p0824/active.env to restore the previous GEMMI tree or remove the donor tree if none existed before deploy.",
+            "primary": false,
             "standalone": true,
             "run_script": "ge_p0824_restore.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -716,7 +870,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 925
+                    "size": 1302
                 },
                 {
                     "path": "scripts/ge_p0824_restore.sh",
@@ -727,8 +881,16 @@
         "jvm-extract": {
             "status": "ready",
             "description": "Extract J9 JVM runtime, UI framework JARs, and application config for offline reverse engineering \u2014 the first step toward custom MMI menu entries",
+            "display": true,
+            "display_order": 110,
+            "display_name": "JVM Extract",
+            "category": "diag",
+            "short_description": "Extract J9 JVM and UI framework for reverse engineering",
+            "detail": "Copies J9 runtime and AppDevelopment.jar to SD for offline analysis.",
+            "primary": false,
             "standalone": true,
             "run_script": "jvm_extract.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -745,7 +907,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 1975
+                    "size": 2281
                 },
                 {
                     "path": "scripts/jvm_extract.sh",
@@ -756,8 +918,16 @@
         "long-coding": {
             "status": "alpha",
             "description": "Display current long-coding / adaptation values for each configurable MMI feature. Read-only display module \u2014 for safe editing use VCDS or ODIS.",
+            "display": true,
+            "display_order": 230,
+            "display_name": "Long Coding",
+            "category": "gem",
+            "short_description": "Live display of adaptation values via GEM (read-only)",
+            "detail": "3 GEM screens for car-device and CAN routing. Read-only \u2014 use VCDS/ODIS to change values.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -786,7 +956,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1353
+                    "size": 1679
                 },
                 {
                     "path": "scripts/coding_changelog.sh",
@@ -805,8 +975,29 @@
         "lte-setup": {
             "status": "ready",
             "description": "Provision MMI3G+ for LTE mobile data via USB Ethernet adapter \u2014 replaces defunct internal 3G modem with external LTE router",
+            "display": true,
+            "display_order": 60,
+            "display_name": "LTE Setup",
+            "category": "net",
+            "short_description": "USB Ethernet for LTE data + persistent root shell (port 23 + 2323)",
+            "detail": "Creates DLinkReplacesPPP flag, enables DHCP on en5, installs dhcp-up for DNS. Adds persistent root shell on port 2323 (inetd.conf) and passwordless root login on port 23 (DrGER2 shadow method). Requires ASIX-based USB Ethernet adapter + LTE router. Restore script cleanly reverts everything.",
+            "primary": false,
             "standalone": true,
             "run_script": "lte_setup.sh",
+            "run_script_options": [
+                {
+                    "value": "lte_setup.sh",
+                    "label": "DHCP Fair Mode \u2014 Standard ASIX (88172/772/772A)"
+                },
+                {
+                    "value": "lte_static.sh",
+                    "label": "Static 172.16.42.1 \u2014 Standard ASIX adapter"
+                },
+                {
+                    "value": "lte_static_772d.sh",
+                    "label": "Static 172.16.42.1 \u2014 AX88772D"
+                }
+            ],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -822,7 +1013,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 1136
+                    "size": 2075
                 },
                 {
                     "path": "scripts/lte_restore.sh",
@@ -853,8 +1044,16 @@
         "map-parser": {
             "status": "ready",
             "description": "Extract and analyze navigation database config \u2014 reads nav DB version, map regions, configured paths, and FSC activation state. Read-only.",
+            "display": true,
+            "display_order": 220,
+            "display_name": "Map Parser",
+            "category": "nav",
+            "short_description": "Extract nav DB descriptor, FSC state, map metadata",
+            "detail": "Dumps acios_db.ini, FSC activation files, nav HDD inventory for offline analysis.",
+            "primary": false,
             "standalone": true,
             "run_script": "map_parse.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -871,7 +1070,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 1261
+                    "size": 1573
                 },
                 {
                     "path": "scripts/map_parse.sh",
@@ -882,8 +1081,16 @@
         "nav-unblocker": {
             "status": "ready",
             "description": "Bypass navigation database activation check - uses DrGER2's improved manage_cd.sh patch method (Keldo's discovery)",
+            "display": true,
+            "display_order": 50,
+            "display_name": "Nav Unblocker",
+            "category": "nav",
+            "short_description": "Bypass navigation database activation check",
+            "detail": "Patches manage_cd.sh to terminate vdev-logvolmgr. Persistent, reversed by firmware reinstall.",
+            "primary": false,
             "standalone": true,
             "run_script": "nav_unblocker.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -900,7 +1107,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 932
+                    "size": 1251
                 },
                 {
                     "path": "scripts/nav_restore.sh",
@@ -919,8 +1126,16 @@
         "password-finder": {
             "status": "ready",
             "description": "Dump stored Wi-Fi hotspot passwords, Audi Connect credentials, and other stored secrets from the MMI's persistence partitions. Read-only \u2014 changes nothing on the unit.",
+            "display": true,
+            "display_order": 200,
+            "display_name": "Password Finder",
+            "category": "diag",
+            "short_description": "Dump stored Wi-Fi, Bluetooth, Audi Connect credentials",
+            "detail": "Read-only scan of /mnt/efs-persist and /mnt/persist. Inspired by jilleb/mib2-toolbox.",
+            "primary": false,
             "standalone": true,
             "run_script": "password_dump.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -937,7 +1152,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 1455
+                    "size": 1781
                 },
                 {
                     "path": "scripts/password_dump.sh",
@@ -948,8 +1163,16 @@
         "per3-reader": {
             "status": "alpha",
             "description": "Read per3 / DSI persistence values from shell scripts. Ships an OSGi bundle that installs into the DSITracer.jar slot on /mnt/efs-system/lsd/ \u2014 on MMI boot, the bundle registers as a DSIPersistenceListener and serves synchronous reads through a file-based trigger mechanism. Answers the long-standing 'how do I read per3 addresses without writing a Java GEM screen' question.",
+            "display": true,
+            "display_order": 90,
+            "display_name": "Per3 Reader",
+            "category": "system",
+            "short_description": "Read DSI persistence values from shell scripts via Java OSGi bundle",
+            "detail": "OSGi bundle installs into DSITracer.jar slot. After reboot, shell scripts can read DSI persistence values. Requires reboot after install.",
+            "primary": false,
             "standalone": true,
             "run_script": "per3_install.sh",
+            "run_script_options": [],
             "artifact": "per3-reader.jar",
             "payload_dirs": [],
             "release_zip": null,
@@ -974,7 +1197,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 3194
+                    "size": 3582
                 },
                 {
                     "path": "per3-reader.jar",
@@ -1073,8 +1296,16 @@
         "per3-writer": {
             "status": "design",
             "description": "Write DSI persistence values from shell scripts via OSGi bundle. Enables GEM activation, coding changes, and feature configuration entirely from SD card \u2014 no VCDS/ODIS needed.",
+            "display": true,
+            "display_order": 100,
+            "display_name": "Per3 Writer",
+            "category": "system",
+            "short_description": "Write DSI persistence values \u2014 planned DSI bridge for coding changes",
+            "detail": "Design phase. Same OSGi pattern as per3-reader but calls DSIPersistence requestWriteInt. Needs per3-reader verification and live safety testing first.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -1095,15 +1326,23 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 650
+                    "size": 1069
                 }
             ]
         },
         "persistence-dump": {
             "status": "ready",
             "description": "Dumps persistence state (HBpersistence, efs-persist, shmem, coding) to SD card for offline analysis \u2014 use before/after VCDS changes to find exact byte locations",
+            "display": false,
+            "display_order": null,
+            "display_name": "Persistence Dump",
+            "category": "diag",
+            "short_description": "Dump persistence data and configuration to SD.",
+            "detail": "Dump persistence data and configuration to SD.",
+            "primary": false,
             "standalone": true,
             "run_script": "persist_dump.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -1120,7 +1359,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 573
+                    "size": 828
                 },
                 {
                     "path": "scripts/persist_dump.sh",
@@ -1131,8 +1370,16 @@
         "region-audit": {
             "status": "planned",
             "description": "Read-only region and VZE/TSR audit. Shows live region-related persistence values in GEM and writes a structured audit report to SD card.",
+            "display": false,
+            "display_order": null,
+            "display_name": "Region Audit",
+            "category": "diag",
+            "short_description": "Read-only region and VZE/TSR audit.",
+            "detail": "Read-only region and VZE/TSR audit.",
+            "primary": false,
             "standalone": false,
             "run_script": null,
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -1152,7 +1399,7 @@
                 },
                 {
                     "path": "module.json",
-                    "size": 1540
+                    "size": 1761
                 },
                 {
                     "path": "scripts/region_audit.sh",
@@ -1163,8 +1410,16 @@
         "splash-screen": {
             "status": "ready",
             "description": "Custom boot splash screen installer - upload any image, auto-formatted to 800x480 PNG via the desktop app",
+            "display": true,
+            "display_order": 40,
+            "display_name": "Splash Screen",
+            "category": "visual",
+            "short_description": "Custom boot logo \u2014 use the formatter tab to prepare your image",
+            "detail": "Copies 800x480 PNG to /mnt/efs-system/etc/splashscreens/. Backs up factory screens automatically.",
+            "primary": false,
             "standalone": true,
             "run_script": "splash_install.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -1181,7 +1436,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 973
+                    "size": 1354
                 },
                 {
                     "path": "scripts/splash_install.sh",
@@ -1196,8 +1451,16 @@
         "system-info": {
             "status": "ready",
             "description": "Comprehensive system diagnostic \u2014 gathers identity, activations, credentials, storage, network, persistence state, and backs up key files to SD card. Single pass, no flash writes.",
+            "display": true,
+            "display_order": 10,
+            "display_name": "System Info",
+            "category": "diag",
+            "short_description": "Complete diagnostic \u2014 identity, activations, credentials, nav DB, persistence backup, bus topology. Single pass, no flash writes.",
+            "detail": "14-section report: system identity, GEM state, activation/FSC, credentials + sweep, storage, network, installed mods, HBpersistence backup, processes, syslog, nav DB/map/acios_db.ini, credential sweep, CVALUE/FSC file backup, QNX kernel + IPC/DSP/MOST/CAN bus topology. Consolidates system-info + password-finder + variant-dump + persistence-dump + map-parser.",
+            "primary": true,
             "standalone": true,
             "run_script": "sysinfo_dump.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -1214,7 +1477,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 798
+                    "size": 1492
                 },
                 {
                     "path": "scripts/sysinfo_dump.sh",
@@ -1225,8 +1488,16 @@
         "variant-dump": {
             "status": "ready",
             "description": "MMI identification + configuration dumper \u2014 captures train name, MU software version, MU variant, HMI region, kernel info, HDD/partition layout, nav database state, FSC status, persistence file inventory, and LVM unblocker status. Mirrors DrGER2's mmi3ginfo3 approach. Read-only, writes a text report to SD card.",
+            "display": true,
+            "display_order": 210,
+            "display_name": "Variant Dump",
+            "category": "diag",
+            "short_description": "System ID dump \u2014 train, versions, FSC status, partitions, nav DB state",
+            "detail": "Car-device list, CAN assignments, ID strings, live sensors. Uses filesystem-backed sources and logs to SD.",
+            "primary": false,
             "standalone": true,
             "run_script": "variant_dump.sh",
+            "run_script_options": [],
             "artifact": null,
             "payload_dirs": [],
             "release_zip": null,
@@ -1243,7 +1514,7 @@
             "files": [
                 {
                     "path": "module.json",
-                    "size": 2250
+                    "size": 2612
                 },
                 {
                     "path": "scripts/variant_dump.sh",

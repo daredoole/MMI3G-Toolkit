@@ -4,7 +4,11 @@
     "description": "Display current long-coding / adaptation values for each configurable MMI feature. Read-only display module — for safe editing use VCDS or ODIS.",
     "author": "dspl1236",
     "status": "alpha",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "prereq": "gem-activator",
     "gem_path": "/coding",
     "screens": [
@@ -17,5 +21,11 @@
         "coding_dump.sh - Dump all adaptation values to SD"
     ],
     "notes": "Inspired by the 'Coding' long-coding editor screen in jilleb/mib2-toolbox. IMPORTANT: this MMI3G version is a READ-ONLY display for safety. Changing adaptation values on MMI3G requires the same UDS protocol that VCDS uses — implementing a write-capable editor would require sending UDS requests over the CAN gateway, which is out of scope for this module. To CHANGE values, use VCDS channel 5F or ODIS adaptation. Use this module to see current values before and after making changes with those tools.",
-    "credits": "Concept from jilleb/mib2-toolbox Coding screen. Read-only MMI3G implementation."
+    "credits": "Concept from jilleb/mib2-toolbox Coding screen. Read-only MMI3G implementation.",
+    "display": true,
+    "display_order": 230,
+    "display_name": "Long Coding",
+    "category": "gem",
+    "short_description": "Live display of adaptation values via GEM (read-only)",
+    "detail": "3 GEM screens for car-device and CAN routing. Read-only — use VCDS/ODIS to change values."
 }

@@ -4,7 +4,11 @@
     "description": "Extract and analyze navigation database config — reads nav DB version, map regions, configured paths, and FSC activation state. Read-only.",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "map_parse.sh",
     "script_dir": "/scripts/MapParser",
@@ -20,5 +24,11 @@
         "Navigation HDD partition layout"
     ],
     "notes": "Inspired by the MapConfigParser.html tool in jilleb/mib2-toolbox. Harman navigation uses the same acios_db.ini format across MMI3G and MIB2 generations, so the underlying data is similar even though the firmware versions differ. This module extracts the metadata; the companion HTML viewer in the MMI3G-Toolkit web app can render it.",
-    "credits": "Concept from jilleb/mib2-toolbox MapConfigParser.html."
+    "credits": "Concept from jilleb/mib2-toolbox MapConfigParser.html.",
+    "display": true,
+    "display_order": 220,
+    "display_name": "Map Parser",
+    "category": "nav",
+    "short_description": "Extract nav DB descriptor, FSC state, map metadata",
+    "detail": "Dumps acios_db.ini, FSC activation files, nav HDD inventory for offline analysis."
 }

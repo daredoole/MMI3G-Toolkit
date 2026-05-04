@@ -10,7 +10,7 @@ Pick the tools you want, build an SD card, insert it, done.
 
 ## What Is This?
 
-MMI3G-Toolkit is a collection of 20 modules that extend your MMI3G head unit through the built-in SD card script execution mechanism. It includes a Python builder and a web app that assemble your selected modules into a ready-to-use SD card — handling the `copie_scr.sh` encoding automatically.
+MMI3G-Toolkit is a collection of 26 modules that extend your MMI3G head unit through the built-in SD card script execution mechanism. It includes a Python builder and a web app that assemble your selected modules into a ready-to-use SD card — handling the `copie_scr.sh` encoding automatically.
 
 **No VCDS required for most modules. No permanent modifications. No soldering.**
 
@@ -81,7 +81,7 @@ See [docs/SUPPORTED_VEHICLES.md](docs/SUPPORTED_VEHICLES.md) for full details.
 | Module | Status | Description |
 |--------|--------|-------------|
 | **system-info** | ✅ Tested | One-shot system reporter — full MMI state dump to SD |
-| **gem-activator** ⚠️ | ✅ Tested | GEM infrastructure setup. **Setting the enable bit requires VCDS/ODIS** — adaptation 5F channel 6 = 1 |
+| **gem-activator** | ✅ Ready | Enable/disable GEM by creating or removing `/HBpersistence/DBGModeActive` |
 | **gauges-dashboard** | ✅ Tested | Live telemetry — battery voltage, GPS, system info, data logging |
 | **dtc-checker** | ✅ Tested | Read and display diagnostic trouble codes from the GEM |
 | **gemmi-dump** | ✅ Tested | Extract Google Earth (GEMMI) binaries to SD for analysis |
@@ -107,18 +107,13 @@ See [docs/SUPPORTED_VEHICLES.md](docs/SUPPORTED_VEHICLES.md) for full details.
 
 > **⚠️ = external tool required.** Every other module is pure software — SD card in, job done.
 
-## One-Time Prerequisite: Enable GEM with VCDS
+## One-Time Prerequisite: Enable GEM
 
-Before any GEM-screen module does anything visible, the MMI's GEM enable bit must be set. This is a **one-time** operation performed with a diagnostic tool — not from an SD card.
+Before any GEM-screen module does anything visible, GEM must be enabled. The toolkit's `gem-activator` module does this from SD card by creating `/HBpersistence/DBGModeActive`.
 
-| Tool | Path |
-|------|------|
-| VCDS / VCP | Address `5F` (Information Electr.) → Adaptation (10) → Channel `6` → Value `1` → Save |
-| ODIS E17 | Address `5F` → Adaptation → Channel `6` → Value `1` |
+Older guides use VCDS/ODIS adaptation channel 6 for the same goal, but the current toolkit path is to include `gem-activator` with any GEM-screen module. Reboot the MMI after running the card, then hold **CAR + BACK** (MMI 3G+) or **CAR + SETUP** (3G High) for ~5 seconds to open GEM.
 
-Reboot the MMI after saving (hold MENU + rotary knob + upper-right soft key for ~3 seconds). Then hold **CAR + BACK** (MMI 3G+) or **CAR + SETUP** (3G High) for ~5 seconds to open the GEM.
-
-**Why can't an SD script do this?** The adaptation value lives in module 5F's persistent memory and is only writable over UDS (the OBD diagnostic protocol). The MMI's QNX system does not ship a UDS client binary, so there is no way for a shell script running on the head unit to set the flag. The `gem-activator` module in this toolkit only prepares the filesystem — the enable bit itself must be set with VCDS or ODIS.
+If GEM does not appear after reboot, run `system-info` and check the `DBGModeActive` section in the generated report before falling back to VCDS/ODIS.
 
 ## Hardware Requirements
 
@@ -146,7 +141,7 @@ The module is based on [DrGER2/MMI3GP-LAN-Setup](https://github.com/DrGER2/MMI3G
 - Python 3.6+
 - A 32GB SDHC card (not SDXC) formatted as FAT32
 - An Audi/VW with MMI 3G, 3G+, or RNS-850
-- Green Engineering Menu enabled (via VCDS: address 5F, adaptation channel 6 = 1)
+- For GEM-screen modules, include `gem-activator` or confirm GEM is already enabled
 
 ### Build an SD Card
 

@@ -4,7 +4,11 @@
     "description": "MMI identification + configuration dumper — captures train name, MU software version, MU variant, HMI region, kernel info, HDD/partition layout, nav database state, FSC status, persistence file inventory, and LVM unblocker status. Mirrors DrGER2's mmi3ginfo3 approach. Read-only, writes a text report to SD card.",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "variant_dump.sh",
     "script_dir": "/scripts/VariantDump",
@@ -29,5 +33,11 @@
         "Persistence directory inventory"
     ],
     "notes": "Previous version (1.0.0) tried to dump per3 adaptation addresses (car-device list, CAN-channel assignment) via a `per3_read` CLI tool. That binary does not exist on MMI3G — per3 / keyValue data is only readable from inside the J9 Java VM via DSIPersistence IPC, not from a shell script. This version follows DrGER2's mmi3ginfo3 pattern and reads real filesystem files instead. To read adaptation values, use VCDS/ODIS or the long-coding module's GEM screens (which run inside Java and can call DSIPersistence).",
-    "credits": "Approach and most of the /etc file paths and sloginfo/pidin/fdisk patterns come directly from DrGER2's mmi3ginfo3-230701."
+    "credits": "Approach and most of the /etc file paths and sloginfo/pidin/fdisk patterns come directly from DrGER2's mmi3ginfo3-230701.",
+    "display": true,
+    "display_order": 210,
+    "display_name": "Variant Dump",
+    "category": "diag",
+    "short_description": "System ID dump — train, versions, FSC status, partitions, nav DB state",
+    "detail": "Car-device list, CAN assignments, ID strings, live sensors. Uses filesystem-backed sources and logs to SD."
 }

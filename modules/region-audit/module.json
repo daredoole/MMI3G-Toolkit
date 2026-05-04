@@ -4,7 +4,10 @@
     "description": "Read-only region and VZE/TSR audit. Shows live region-related persistence values in GEM and writes a structured audit report to SD card.",
     "author": "dspl1236",
     "status": "planned",
-    "compatible": ["MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G+",
+        "RNS-850"
+    ],
     "prereq": "gem-activator",
     "gem_path": "/region",
     "script_dir": "/scripts/RegionAudit",
@@ -22,5 +25,10 @@
         "Optional per3-reader live shell reads when the bundle is already installed"
     ],
     "uninstall": "Use the toolkit uninstall SD or remove the installed engdefs/scripts from /mnt/efs-system. This module writes no custom persistence flags and makes no firmware changes.",
-    "notes": "UNTESTED ON REAL HARDWARE. Status remains 'planned' until verified in-vehicle, per docs/CONTRIBUTING.md. Read-only module. The GEM screen uses keyValue bindings only, so it does not expose writable engineering controls. The shell report uses filesystem sources plus optional per3-reader reads if that separate alpha bundle is already installed."
+    "notes": "UNTESTED ON REAL HARDWARE. Status remains 'planned' until verified in-vehicle, per docs/CONTRIBUTING.md. Read-only module. The GEM screen uses keyValue bindings only, so it does not expose writable engineering controls. The shell report uses filesystem sources plus optional per3-reader reads if that separate alpha bundle is already installed.",
+    "display": false,
+    "display_name": "Region Audit",
+    "category": "diag",
+    "short_description": "Read-only region and VZE/TSR audit.",
+    "detail": "Read-only region and VZE/TSR audit."
 }

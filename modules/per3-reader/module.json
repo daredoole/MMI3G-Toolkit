@@ -4,7 +4,11 @@
     "description": "Read per3 / DSI persistence values from shell scripts. Ships an OSGi bundle that installs into the DSITracer.jar slot on /mnt/efs-system/lsd/ — on MMI boot, the bundle registers as a DSIPersistenceListener and serves synchronous reads through a file-based trigger mechanism. Answers the long-standing 'how do I read per3 addresses without writing a Java GEM screen' question.",
     "author": "dspl1236",
     "status": "alpha",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "per3_install.sh",
     "script_dir": "/scripts/Per3Reader",
@@ -36,5 +40,11 @@
         "Takes the DSITracer.jar slot — if you're actively debugging with DSITracer installed, this will replace it. per3_install.sh preserves the original as .bak so restoring is straightforward.",
         "Requires MMI reboot to take effect (drops onto the bootclasspath at JVM start)."
     ],
-    "credits": "DSIPersistence interface inferred from decompiled FakePersistence and PersistenceAccessor under research/decompiled/. Extension-point pattern (DSITracer.jar slot) documented by Harman-Becker in /mnt/efs-system/lsd/lsd.sh. Motivation and validation: DrGER2's 2026-04 review of this toolkit."
+    "credits": "DSIPersistence interface inferred from decompiled FakePersistence and PersistenceAccessor under research/decompiled/. Extension-point pattern (DSITracer.jar slot) documented by Harman-Becker in /mnt/efs-system/lsd/lsd.sh. Motivation and validation: DrGER2's 2026-04 review of this toolkit.",
+    "display": true,
+    "display_order": 90,
+    "display_name": "Per3 Reader",
+    "category": "system",
+    "short_description": "Read DSI persistence values from shell scripts via Java OSGi bundle",
+    "detail": "OSGi bundle installs into DSITracer.jar slot. After reboot, shell scripts can read DSI persistence values. Requires reboot after install."
 }

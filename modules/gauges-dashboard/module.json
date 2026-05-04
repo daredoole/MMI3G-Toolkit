@@ -4,7 +4,11 @@
     "description": "Live vehicle telemetry dashboard - battery voltage, GPS status, system info with data logging to SD card",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "script_dir": "/scripts/Gauges",
     "gem_path": "/gauges",
     "screens": [
@@ -22,5 +26,11 @@
         "ifconfig.sh - Interface config (GEM console)",
         "routetable.sh - Routing table (GEM console)",
         "dnscheck.sh - DNS and connection status"
-    ]
+    ],
+    "display": true,
+    "display_order": 30,
+    "display_name": "Gauges Dashboard",
+    "category": "gem",
+    "short_description": "Live telemetry — voltage, GPS, system info, data logging",
+    "detail": "3 GEM screens with 500ms battery polling, GPS satellite tracking, and one-tap data logging to SD card."
 }

@@ -4,7 +4,11 @@
     "description": "Comprehensive system diagnostic — gathers identity, activations, credentials, storage, network, persistence state, and backs up key files to SD card. Single pass, no flash writes.",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "sysinfo_dump.sh",
     "script_dir": "/scripts/SystemInfo",
@@ -12,5 +16,12 @@
     "scripts": [
         "sysinfo_dump.sh - Full diagnostic + backup to SD card"
     ],
-    "notes": "v2.0: Consolidated system-info + password-finder + variant-dump + persistence-dump into single comprehensive diagnostic. Uses sed instead of head/tail (not available on QNX). Runs entirely from SD card."
+    "notes": "v2.0: Consolidated system-info + password-finder + variant-dump + persistence-dump into single comprehensive diagnostic. Uses sed instead of head/tail (not available on QNX). Runs entirely from SD card.",
+    "display": true,
+    "display_order": 10,
+    "display_name": "System Info",
+    "category": "diag",
+    "short_description": "Complete diagnostic — identity, activations, credentials, nav DB, persistence backup, bus topology. Single pass, no flash writes.",
+    "detail": "14-section report: system identity, GEM state, activation/FSC, credentials + sweep, storage, network, installed mods, HBpersistence backup, processes, syslog, nav DB/map/acios_db.ini, credential sweep, CVALUE/FSC file backup, QNX kernel + IPC/DSP/MOST/CAN bus topology. Consolidates system-info + password-finder + variant-dump + persistence-dump + map-parser.",
+    "primary": true
 }

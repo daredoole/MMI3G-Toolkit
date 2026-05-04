@@ -25,7 +25,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script type="text/babel">
-    const { useState, useRef, useCallback, useEffect } = React;
+    const { useState, useRef, useCallback, useEffect, useMemo } = React;
 
 const MMI_W = 800;
 const MMI_H = 480;
@@ -59,100 +59,43 @@ class MMI3GCipher {
 }
 
 const MANIFEST_URL = "./manifest.json";
-const MODULES_DISPLAY = [
-  { id: "system-info", name: "System Info", status: "tested",
-    desc: "Complete diagnostic — identity, activations, credentials, nav DB, persistence backup, bus topology. Single pass, no flash writes.",
-    compat: ["3G", "3G+", "RNS-850"], category: "diag", primary: true,
-    prereq: null, detail: "14-section report: system identity, GEM state, activation/FSC, credentials + sweep, storage, network, installed mods, HBpersistence backup, processes, syslog, nav DB/map/acios_db.ini, credential sweep, CVALUE/FSC file backup, QNX kernel + IPC/DSP/MOST/CAN bus topology. Consolidates system-info + password-finder + variant-dump + persistence-dump + map-parser." },
-  { id: "gem-activator", name: "GEM Activator", status: "tested",
-    desc: "Enable the Green Engineering Menu from SD card — creates /HBpersistence/DBGModeActive. No VCDS needed!",
-    compat: ["3G", "3G+", "RNS-850"], category: "system",
-    prereq: null, detail: "Creates the DBGModeActive file marker checked by the MMI firmware at boot. Reboot after running to activate GEM. Confirmed working on MMI 3G+." },
-  { id: "gauges-dashboard", name: "Gauges Dashboard", status: "tested",
-    desc: "Live telemetry — voltage, GPS, system info, data logging",
-    compat: ["3G", "3G+", "RNS-850"], category: "gem",
-    prereq: "gem-activator", detail: "3 GEM screens with 500ms battery polling, GPS satellite tracking, and one-tap data logging to SD card." },
-  { id: "splash-screen", name: "Splash Screen", status: "alpha",
-    desc: "Custom boot logo — use the formatter tab to prepare your image",
-    compat: ["3G", "3G+", "RNS-850"], category: "visual",
-    prereq: null, detail: "Copies 800x480 PNG to /mnt/efs-system/etc/splashscreens/. Backs up factory screens automatically." },
-  { id: "nav-unblocker", name: "Nav Unblocker", status: "alpha",
-    desc: "Bypass navigation database activation check",
-    compat: ["3G", "3G+", "RNS-850"], category: "nav",
-    prereq: null, detail: "Patches manage_cd.sh to terminate vdev-logvolmgr. Persistent, reversed by firmware reinstall." },
-  { id: "lte-setup", name: "LTE Setup", status: "alpha",
-    desc: "USB Ethernet for LTE data + persistent root shell (port 23 + 2323)",
-    compat: ["3G+", "RNS-850"], category: "net",
-    prereq: null, detail: "Creates DLinkReplacesPPP flag, enables DHCP on en5, installs dhcp-up for DNS. Adds persistent root shell on port 2323 (inetd.conf) and passwordless root login on port 23 (DrGER2 shadow method). Enables Google Earth UI via SysConstManager NAD detection. Requires ASIX-based USB Ethernet adapter + LTE router. Restore script cleanly reverts everything." },
-  { id: "can-scanner", name: "CAN Scanner", status: "alpha",
-    desc: "CAN bus address scanner — discover RPM, boost, coolant, speed",
-    compat: ["3G", "3G+", "RNS-850"], category: "diag",
-    prereq: "gem-activator", detail: "Live address scan via per3 namespace. Great for discovering custom data for gauges dashboard." },
-    { id: "dtc-checker", name: "DTC Checker", status: "tested",
-    desc: "Onboard diagnostic trouble code reader — view and clear DTCs from the GEM",
-    compat: ["3G", "3G+", "RNS-850"], category: "gem",
-    prereq: "gem-activator", detail: "3 GEM screens: DTC overview (20 rows), single DTC detail with status flags, and DTC control (clear/test). Uses DSI namespace 2 via IOC. V850 IOC has TP2.0 diagnostic protocol support." },
-    { id: "per3-reader", name: "Per3 Reader", status: "alpha",
-    desc: "Read DSI persistence values from shell scripts via Java OSGi bundle",
-    compat: ["3G", "3G+", "RNS-850"], category: "system",
-    prereq: null, detail: "OSGi bundle installs into DSITracer.jar slot. After reboot, shell scripts can read any DSI persistence value (battery voltage, coding bytes, train name). Requires reboot after install." },
-  { id: "per3-writer", name: "Per3 Writer", status: "design",
-    desc: "Write DSI persistence values — enable GEM, change coding without VCDS",
-    compat: ["3G", "3G+", "RNS-850"], category: "system",
-    prereq: "per3-reader", detail: "Same OSGi pattern as per3-reader but calls requestWriteInt. Would enable GEM activation, coding changes, and feature configuration entirely from SD card. Design phase — needs per3-reader verified first." },
-  { id: "jvm-extract", name: "JVM Extract", status: "alpha",
-    desc: "Extract J9 JVM and UI framework for reverse engineering",
-    compat: ["3G", "3G+", "RNS-850"], category: "diag",
-    prereq: null, detail: "Copies J9 runtime and AppDevelopment.jar to SD for offline analysis." },
-  { id: "game-loader", name: "Game Loader", status: "alpha",
-    desc: "Run Java games on the MMI's J9 JVM from SD card",
-    compat: ["3G", "3G+", "RNS-850"], category: "visual",
-    prereq: "gem-activator", detail: "Launcher module plus example games. Loads signed JARs via the built-in job framework." },
-  { id: "gemmi-dump", name: "GEMMI Dump", status: "tested",
-    desc: "Extract Google Earth binaries from HDD for offline analysis and patching",
-    compat: ["3G+", "RNS-850"], category: "diag",
-    prereq: null, detail: "Copies gemmi_final (~2MB), libembeddedearth.so (~20MB), and all GEMMI config/scripts to SD card. Needed for Ghidra RE of Google hostnames and auth bypass. Based on ruthr/congo approach." },
-  { id: "google-earth", name: "Google Earth", status: "tested",
-    desc: "Google Earth satellite imagery — live tiles from Google\'s servers",
-    compat: ["3G+", "RNS-850"], category: "system",
-    prereq: null, detail: "Restores Google Earth satellite imagery to your MMI3G+ head unit. Deploys a lightweight on-car proxy that serves map data directly from Google\\'s tile servers — no PC or external server required. Just build the SD card, insert, reboot, and enjoy live satellite imagery from the map menu. Requires working internet (LTE, WiFi tethering, USB Ethernet, or any other method). Zoom levels 1-22+ confirmed working." },
-  { id: "google-earth-gemmi-wrappers", name: "GEMMI Wrappers", status: "alpha",
-    desc: "Install legacy /scripts/GEMMI controls expected by the OEM Google Earth screen",
-    compat: ["RNS-850"], category: "system",
-    prereq: null, detail: "Installs shell wrappers for activate/deactivate/start/stop/cache controls that forward to the deployed /mnt/nav/gemmi runtime." },
-  { id: "google-earth-p0824-deploy", name: "P0824 GEMMI Deploy", status: "alpha",
-    desc: "Deploy bundled EU VW P0824 GEMMI donor payload to /mnt/nav/gemmi",
-    compat: ["RNS-850"], category: "system",
-    prereq: null, payloadUrl: "https://dspl1236.github.io/MMI3G-Toolkit/payloads/gemmi_p0824_eu_vw.zip", detail: "Backs up the existing /mnt/nav/gemmi tree, copies the bundled EU VW P0824 GEMMI payload from SD card root /gemmi, and adds minimal drivers.ini auth-bypass settings. Does not patch lsd.jxe or firmware. The web app fetches the payload from the same GitHub Pages origin to avoid browser CORS limits." },
-  { id: "google-earth-p0824-restore", name: "P0824 GEMMI Restore", status: "alpha",
-    desc: "Restore /mnt/nav/gemmi from the backup made by P0824 GEMMI Deploy",
-    compat: ["RNS-850"], category: "system",
-    prereq: null, detail: "Uses /mnt/nav/.mmi3g_toolkit/google-earth-p0824/active.env to restore the previous GEMMI tree or remove the donor tree if none existed before deploy." },
-  { id: "dns-refresh-probe", name: "DNS Refresh Probe", status: "alpha",
-    desc: "One-shot route/DNS diagnostic and temporary /etc/resolv.conf refresh",
-    compat: ["3G+", "RNS-850"], category: "net",
-    prereq: null, detail: "Snapshots route and DNS state, backs up /etc/resolv.conf to SD, rewrites nameserver to /dns-refresh-target.txt override or the default gateway, then reruns connectivity checks." },
-  { id: "diag-tool", name: "Diag Tool", status: "alpha",
-    desc: "UDS diagnostic scanner — needs VAG-COM cable",
-    compat: ["3G+"], category: "diag",
-    prereq: null, detail: "Auto-scans modules, reads/clears DTCs. Alpha — requires external diagnostic hardware." },
-  { id: "password-finder", name: "Password Finder", status: "tested",
-    desc: "Dump stored Wi-Fi, Bluetooth, Audi Connect credentials",
-    compat: ["3G", "3G+", "RNS-850"], category: "diag",
-    prereq: null, detail: "Read-only scan of /mnt/efs-persist and /mnt/persist. Inspired by jilleb/mib2-toolbox." },
-  { id: "variant-dump", name: "Variant Dump", status: "tested",
-    desc: "System ID dump — train, versions, FSC status, partitions, nav DB state",
-    compat: ["3G", "3G+", "RNS-850"], category: "diag",
-    prereq: null, detail: "Car-device list, CAN assignments, ID strings, live sensors. Uses the documented per3 map." },
-  { id: "map-parser", name: "Map Parser", status: "tested",
-    desc: "Extract nav DB descriptor, FSC state, map metadata",
-    compat: ["3G", "3G+", "RNS-850"], category: "nav",
-    prereq: null, detail: "Dumps acios_db.ini, FSC activation files, nav HDD inventory for offline analysis." },
-  { id: "long-coding", name: "Long Coding", status: "alpha",
-    desc: "Live display of adaptation values via GEM (read-only)",
-    compat: ["3G", "3G+", "RNS-850"], category: "gem",
-    prereq: "gem-activator", detail: "3 GEM screens for car-device, CAN routing. Read-only — use VCDS/ODIS to change values." },
-];
+function normalizeDisplayModule(id, meta) {
+  const notes = Array.isArray(meta.notes) ? meta.notes.join(" ") : (meta.notes || "");
+  return {
+    id,
+    name: meta.display_name || id.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+    status: meta.status || "unknown",
+    desc: meta.short_description || meta.description || "",
+    compat: meta.compatible || [],
+    category: meta.category || "system",
+    primary: !!meta.primary,
+    prereq: meta.prereq || null,
+    detail: meta.detail || notes || meta.description || "",
+    payloadUrl: meta.release_zip?.web_url || meta.prebuilt_zip || null,
+    cliOnly: meta.web_build === false,
+    runScriptOptions: meta.run_script_options || [],
+    displayOrder: Number.isFinite(Number(meta.display_order)) ? Number(meta.display_order) : 999,
+  };
+}
+
+function displayModulesFromManifest(manifest) {
+  if (!manifest || !manifest.modules) return [];
+  return Object.entries(manifest.modules)
+    .filter(([, meta]) => meta.display !== false)
+    .map(([id, meta]) => normalizeDisplayModule(id, meta))
+    .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
+}
+
+function statusBadgeStyle(status) {
+  const styles = {
+    tested: { background: "#052e16", color: "#4ade80" },
+    ready: { background: "#052e16", color: "#4ade80" },
+    alpha: { background: "#451a03", color: "#fbbf24" },
+    planned: { background: "#1e1b4b", color: "#818cf8" },
+    design: { background: "#1e1b4b", color: "#818cf8" },
+  };
+  return styles[status] || { background: "#1f2937", color: "#9ca3af" };
+}
 
 const MODELS = [
   { id: "a6c7", label: "A6/A7 C7", brand: "audi", fsc: "escrsa" },
@@ -667,10 +610,11 @@ async function downloadBundleAsZip(bundle, filename) {
 function App() {
   const [tab, setTab] = useState("modules");
   const [selected, setSelected] = useState(new Set(["system-info"]));
+  const [appManifest, setAppManifest] = useState(null);
+  const [manifestError, setManifestError] = useState(null);
   const [model, setModel] = useState("a6c7");
   const [expandedMod, setExpandedMod] = useState(null);
-  const [geScript, setGeScript] = useState("ge_deploy_oncar.sh");
-  const [lteMode, setLteMode] = useState("lte_setup.sh");
+  const [scriptOverrides, setScriptOverrides] = useState({});
   const [buildState, setBuildState] = useState("idle"); // idle | building | done | error
   const [buildProgress, setBuildProgress] = useState({ label: "", pct: 0 });
   const [buildError, setBuildError] = useState(null);
@@ -683,6 +627,30 @@ function App() {
   const [exported, setExported] = useState(false);
   const canvasRef = useRef(null);
   const fileRef = useRef(null);
+  const displayModules = useMemo(() => displayModulesFromManifest(appManifest), [appManifest]);
+  const displayModuleById = useMemo(() => new Map(displayModules.map(m => [m.id, m])), [displayModules]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchJson(MANIFEST_URL)
+      .then((manifest) => {
+        if (cancelled) return;
+        setAppManifest(manifest);
+        setManifestError(null);
+        const defaults = {};
+        for (const [id, meta] of Object.entries(manifest.modules || {})) {
+          const first = (meta.run_script_options || [])[0];
+          if (first) defaults[id] = first.value;
+        }
+        setScriptOverrides(defaults);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        console.error(e);
+        setManifestError(String(e.message || e));
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const processImage = useCallback(() => {
     if (!sourceImg) return;
@@ -714,14 +682,19 @@ function App() {
     r.readAsDataURL(f);
   };
 
+  const addWithPrereqs = (set, id) => {
+    set.add(id);
+    const prereq = appManifest?.modules?.[id]?.prereq;
+    if (prereq && !set.has(prereq)) addWithPrereqs(set, prereq);
+  };
+
   const toggle = (id) => {
     const s = new Set(selected);
-    if (s.has(id)) s.delete(id); else s.add(id);
-    MODULES_DISPLAY.forEach(m => { if (s.has(m.id) && m.prereq && !s.has(m.prereq)) s.add(m.prereq); });
+    if (s.has(id)) s.delete(id); else addWithPrereqs(s, id);
     setSelected(s);
   };
 
-  const selectAll = () => setSelected(new Set(MODULES_DISPLAY.map(m => m.id)));
+  const selectAll = () => setSelected(new Set(displayModules.map(m => m.id)));
   const selectNone = () => setSelected(new Set());
   const pw = MMI_W * PREVIEW_SCALE;
   const ph = MMI_H * PREVIEW_SCALE;
@@ -729,9 +702,9 @@ function App() {
   // Build bundle into memory. Used by both "Write to SD" and "Download ZIP".
   const buildInMemory = async () => {
     // Check for modules that can't be web-built (CORS-blocked release assets)
-    const blocked = [...selected].filter(m => MODULES_DISPLAY.find(d => d.id === m && d.cliOnly));
+    const blocked = [...selected].filter(m => displayModuleById.get(m)?.cliOnly);
     if (blocked.length > 0) {
-      const mod = MODULES_DISPLAY.find(d => d.id === blocked[0]);
+      const mod = displayModuleById.get(blocked[0]);
       const payloadLine = mod.payloadUrl ? `\n\nPayload ZIP:\n  ${mod.payloadUrl}` : "";
       const message =
         `"${mod.name}" requires a payload ZIP hosted on GitHub Releases which browsers cannot download (CORS).\n\n` +
@@ -750,7 +723,7 @@ function App() {
     try {
       const bundle = await buildSdBundle([...selected], (label, pct) => {
         setBuildProgress({ label, pct });
-      }, { "google-earth": geScript, "lte-setup": lteMode });
+      }, scriptOverrides);
       const totalBytes = bundle.files.reduce((n, f) => n + f.bytes.length, 0);
       setBuildStats({ fileCount: bundle.files.filter(f => !f.path.endsWith("/.keep")).length, totalBytes });
       return bundle;
@@ -807,7 +780,7 @@ function App() {
   const sdTree = () => {
     let l = ["SD Root/", "\u251C\u2500\u2500 copie_scr.sh  (encoded)", "\u251C\u2500\u2500 run.sh        (auto-generated)", "\u251C\u2500\u2500 uninstall.sh"];
     if (selected.has("splash-screen")) l.push("\u251C\u2500\u2500 splashscreens/", "\u2502   \u2514\u2500\u2500 startup_generic.png");
-    if ([...selected].some(id => { const m = MODULES_DISPLAY.find(x => x.id === id); return m && (m.category === "gem" || m.category === "visual"); }))
+    if ([...selected].some(id => { const m = displayModuleById.get(id); return m && (m.category === "gem" || m.category === "visual"); }))
       l.push("\u251C\u2500\u2500 engdefs/", "\u2502   \u2514\u2500\u2500 *.esd");
     l.push("\u251C\u2500\u2500 scripts/", "\u2502   \u2514\u2500\u2500 *.sh", "\u251C\u2500\u2500 bin/", "\u251C\u2500\u2500 lib/", "\u2514\u2500\u2500 var/  (logs saved here)");
     return l.join("\n");
@@ -815,6 +788,7 @@ function App() {
 
   const repoUrl = "https://github.com/dspl1236/MMI3G-Toolkit";
   const chromium = typeof window !== "undefined" && "showDirectoryPicker" in window;
+  const cliCommand = "python builder/build_sd.py" + [...selected].map(id => " -m " + id).join("") + " -o F:\\";
 
   return React.createElement("div", { style: { minHeight: "100vh", background: "#0a0a0c", color: "#e0ddd8", fontFamily: "'DM Sans', system-ui, sans-serif" } },
     React.createElement("link", { href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap", rel: "stylesheet" }),
@@ -845,9 +819,11 @@ function App() {
           React.createElement("button", { onClick: selectAll, style: { padding: "4px 10px", borderRadius: 4, border: "1px solid #252528", background: "#111114", color: "#777", fontSize: 10, cursor: "pointer", fontFamily: "IBM Plex Mono" } }, "All"),
           React.createElement("button", { onClick: selectNone, style: { padding: "4px 10px", borderRadius: 4, border: "1px solid #252528", background: "#111114", color: "#777", fontSize: 10, cursor: "pointer", fontFamily: "IBM Plex Mono" } }, "None")
         ),
+        manifestError && React.createElement("div", { style: { padding: 10, borderRadius: 6, background: "rgba(185,28,28,0.08)", border: "1px solid rgba(185,28,28,0.3)", color: "#fca5a5", fontFamily: "IBM Plex Mono", fontSize: 11, marginBottom: 10 } }, "Failed to load manifest: " + manifestError),
+        !manifestError && displayModules.length === 0 && React.createElement("div", { style: { padding: 20, borderRadius: 8, background: "#111114", border: "1px solid #1e1e22", color: "#666", fontSize: 13, textAlign: "center" } }, "Loading modules..."),
         React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 8 } },
           // Primary modules (Start Here) rendered full-width at top
-          ...MODULES_DISPLAY.filter(m => m.primary).map(m => {
+          ...displayModules.filter(m => m.primary).map(m => {
             const isSel = selected.has(m.id);
             return React.createElement("div", { key: m.id, onClick: () => toggle(m.id), style: { gridColumn: "1 / -1", padding: "14px 16px", borderRadius: 7, cursor: "pointer", border: isSel ? "1px solid #c41e3a" : "1px solid #2a4a2a", background: isSel ? "rgba(196,30,58,0.05)" : "rgba(0,80,30,0.08)", transition: "all 0.15s" } },
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } },
@@ -861,9 +837,10 @@ function App() {
             );
           }),
           // Regular modules in grid
-          ...MODULES_DISPLAY.filter(m => !m.primary).map(m => {
+          ...displayModules.filter(m => !m.primary).map(m => {
             const isSel = selected.has(m.id);
             const isExp = expandedMod === m.id;
+            const badge = statusBadgeStyle(m.status);
             return React.createElement("div", { key: m.id, onClick: () => toggle(m.id), style: { padding: "11px 12px", borderRadius: 7, cursor: "pointer", border: isSel ? "1px solid #c41e3a" : "1px solid #1e1e22", background: isSel ? "rgba(196,30,58,0.05)" : "#111114", transition: "all 0.15s" } },
               React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: isExp ? 6 : 0 } },
                 React.createElement("div", { style: { width: 14, height: 14, borderRadius: 3, border: isSel ? "none" : "1px solid #333", background: isSel ? "#c41e3a" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", fontWeight: 700, flexShrink: 0 } }, isSel ? "\u2713" : ""),
@@ -871,7 +848,8 @@ function App() {
                   React.createElement("div", { style: { fontSize: 13, fontWeight: 600, color: isSel ? "#fff" : "#bbb", display: "flex", alignItems: "center", gap: 6 } },
                     React.createElement("div", { style: { width: 6, height: 6, borderRadius: "50%", background: CAT_COLORS[m.category], flexShrink: 0 } }),
                     m.name,
-                    m.status === "alpha" && React.createElement("span", { style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#451a03", color: "#fbbf24", fontFamily: "IBM Plex Mono" } }, "alpha"), m.status === "tested" && React.createElement("span", { style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#052e16", color: "#4ade80", fontFamily: "IBM Plex Mono" } }, "tested"), m.status === "design" && React.createElement("span", { style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#1e1b4b", color: "#818cf8", fontFamily: "IBM Plex Mono" } }, "design"), m.cliOnly && React.createElement("span", { style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#1e1b4b", color: "#c084fc", fontFamily: "IBM Plex Mono" } }, "CLI only")
+                    React.createElement("span", { style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: badge.background, color: badge.color, fontFamily: "IBM Plex Mono" } }, m.status),
+                    m.cliOnly && React.createElement("span", { style: { fontSize: 9, padding: "1px 5px", borderRadius: 3, background: "#1e1b4b", color: "#c084fc", fontFamily: "IBM Plex Mono" } }, "CLI only")
                   ),
                   React.createElement("div", { style: { fontSize: 11, color: "#666", marginTop: 1 } }, m.desc)
                 ),
@@ -882,21 +860,10 @@ function App() {
                 m.payloadUrl && React.createElement("div", { style: { marginTop: 8 } },
                   React.createElement("a", { href: m.payloadUrl, target: "_blank", rel: "noopener", onClick: (e) => e.stopPropagation(), style: { color: "#e84a6a", fontFamily: "IBM Plex Mono", fontSize: 10 } }, "Download payload ZIP")
                 ),
-                m.id === "google-earth" && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#0a0a0c", borderRadius: 6, border: "1px solid #1e1e22" } },
+                m.runScriptOptions.length > 0 && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#0a0a0c", borderRadius: 6, border: "1px solid #1e1e22" } },
                   React.createElement("div", { style: { fontSize: 10, color: "#fbbf24", fontFamily: "IBM Plex Mono", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" } }, "Script to run"),
-                  React.createElement("select", { value: geScript, onClick: (e) => e.stopPropagation(), onChange: (e) => { e.stopPropagation(); setGeScript(e.target.value); }, style: { width: "100%", padding: "7px 8px", borderRadius: 5, border: "1px solid #2a2a35", background: "#111114", color: "#e0ddd8", fontSize: 12, fontFamily: "IBM Plex Mono", cursor: "pointer", outline: "none" } },
-                    React.createElement("option", { value: "ge_deploy_oncar.sh" }, "\u{1F4E1} Deploy (install Google Earth)"),
-                    React.createElement("option", { value: "ge_deploy_v6.sh" }, "\u{1F6F0}\uFE0F Deploy (v6 StreetView Test)"),
-                    React.createElement("option", { value: "ge_probe.sh" }, "\u{1F50D} Probe (safe, read-only)"),
-                    React.createElement("option", { value: "ge_restore.sh" }, "\u21A9 Restore (revert all changes)")
-                  )
-                ),
-                m.id === "lte-setup" && React.createElement("div", { style: { marginTop: 8, padding: "8px 10px", background: "#0a0a0c", borderRadius: 6, border: "1px solid #1e1e22" } },
-                  React.createElement("div", { style: { fontSize: 10, color: "#fbbf24", fontFamily: "IBM Plex Mono", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.08em" } }, "Configuration"),
-                  React.createElement("select", { value: lteMode, onClick: (e) => e.stopPropagation(), onChange: (e) => { e.stopPropagation(); setLteMode(e.target.value); }, style: { width: "100%", padding: "7px 8px", borderRadius: 5, border: "1px solid #2a2a35", background: "#111114", color: "#e0ddd8", fontSize: 12, fontFamily: "IBM Plex Mono", cursor: "pointer", outline: "none" } },
-                    React.createElement("option", { value: "lte_setup.sh" }, "\u{1F50C} DHCP Fair Mode \u2014 Standard ASIX (88172/772/772A)"),
-                    React.createElement("option", { value: "lte_static.sh" }, "\u{1F50C} Static 172.16.42.1 \u2014 Standard ASIX adapter"),
-                    React.createElement("option", { value: "lte_static_772d.sh" }, "\u{1F50C} Static 172.16.42.1 \u2014 AX88772D")
+                  React.createElement("select", { value: scriptOverrides[m.id] || m.runScriptOptions[0].value, onClick: (e) => e.stopPropagation(), onChange: (e) => { e.stopPropagation(); setScriptOverrides({ ...scriptOverrides, [m.id]: e.target.value }); }, style: { width: "100%", padding: "7px 8px", borderRadius: 5, border: "1px solid #2a2a35", background: "#111114", color: "#e0ddd8", fontSize: 12, fontFamily: "IBM Plex Mono", cursor: "pointer", outline: "none" } },
+                    ...m.runScriptOptions.map(opt => React.createElement("option", { key: opt.value, value: opt.value }, opt.label))
                   )
                 ),
                 m.prereq && React.createElement("div", { style: { marginTop: 4, fontSize: 10, color: "#e84a6a", fontFamily: "IBM Plex Mono" } }, "Requires: " + m.prereq)
@@ -964,7 +931,7 @@ function App() {
                 React.createElement("button", { onClick: () => setTab("modules"), style: { marginTop: 10, padding: "6px 14px", borderRadius: 5, border: "1px solid #2a2a2e", background: "#151518", color: "#888", fontSize: 11, cursor: "pointer" } }, "\u2190 Select Modules")
               )
             : React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 4 } },
-                MODULES_DISPLAY.filter(m => selected.has(m.id)).map(m =>
+                displayModules.filter(m => selected.has(m.id)).map(m =>
                   React.createElement("div", { key: m.id, style: { padding: "8px 12px", borderRadius: 6, background: "#111114", border: "1px solid #1e1e22", display: "flex", alignItems: "center", gap: 8 } },
                     React.createElement("div", { style: { width: 6, height: 6, borderRadius: "50%", background: CAT_COLORS[m.category], flexShrink: 0 } }),
                     React.createElement("span", { style: { fontSize: 12, fontFamily: "IBM Plex Mono", fontWeight: 500, flex: 1 } }, m.name),
@@ -1054,9 +1021,9 @@ function App() {
           React.createElement("div", { style: { marginTop: 14, padding: 12, borderRadius: 7, background: "#111114", border: "1px solid #1e1e22" } },
             React.createElement("div", { style: { fontSize: 10, color: "#555", fontFamily: "IBM Plex Mono", marginBottom: 6 } }, "Or use the CLI"),
             React.createElement("pre", { style: { background: "#0a0a0c", borderRadius: 6, padding: 10, fontSize: 11, fontFamily: "IBM Plex Mono", color: "#e84a6a", margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all", border: "1px solid #1a1a1e" } },
-              "python builder/build_sd.py" + (selected.size === MODULES_DISPLAY.length ? " --all" : [...selected].map(id => " -m " + id).join("")) + " -o F:\\"
+              cliCommand
             ),
-            React.createElement("button", { onClick: () => { navigator.clipboard?.writeText("python builder/build_sd.py" + (selected.size === MODULES_DISPLAY.length ? " --all" : [...selected].map(id => " -m " + id).join("")) + " -o F:\\"); }, style: { marginTop: 8, padding: "4px 10px", borderRadius: 4, border: "1px solid #2a2a2e", background: "#151518", color: "#777", fontSize: 10, cursor: "pointer", fontFamily: "IBM Plex Mono" } }, "Copy command")
+            React.createElement("button", { onClick: () => { navigator.clipboard?.writeText(cliCommand); }, style: { marginTop: 8, padding: "4px 10px", borderRadius: 4, border: "1px solid #2a2a2e", background: "#151518", color: "#777", fontSize: 10, cursor: "pointer", fontFamily: "IBM Plex Mono" } }, "Copy command")
           ),
 
           React.createElement("div", { style: { marginTop: 12, padding: 12, borderRadius: 7, background: "#111114", border: "1px solid #1e1e22" } },

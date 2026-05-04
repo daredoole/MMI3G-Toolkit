@@ -50,5 +50,29 @@
         "dbroot": "Custom EncryptedDbRootProto with geoServer→kh.google.com",
         "auth": "Static cached responses (auth1: 16b, auth2: 136b)",
         "tiles": "Plain HTTP from kh.google.com (no SSL needed)"
-    }
+    },
+    "display": true,
+    "display_order": 140,
+    "display_name": "Google Earth",
+    "category": "system",
+    "short_description": "Google Earth satellite imagery — live tiles from Google's servers",
+    "detail": "Restores Google Earth satellite imagery to MMI3G+ head units. Deploys an on-car proxy that serves map data directly from Google's tile servers. Requires working internet via LTE, Wi-Fi tethering, USB Ethernet, or equivalent.",
+    "run_script_options": [
+        {
+            "value": "ge_deploy_oncar.sh",
+            "label": "Deploy (install Google Earth)"
+        },
+        {
+            "value": "ge_deploy_v6.sh",
+            "label": "Deploy (v6 StreetView Test)"
+        },
+        {
+            "value": "ge_probe.sh",
+            "label": "Probe (safe, read-only)"
+        },
+        {
+            "value": "ge_restore.sh",
+            "label": "Restore (revert all changes)"
+        }
+    ]
 }

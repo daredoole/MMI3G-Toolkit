@@ -11,6 +11,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILD_SCRIPT = REPO_ROOT / 'builder' / 'build_sd.py'
 GENERATE_MANIFEST = REPO_ROOT / 'builder' / 'generate_manifest.py'
 WEB_BUILDER = REPO_ROOT / 'docs' / 'app' / 'index.html'
+README = REPO_ROOT / 'README.md'
 
 
 def load_module(module_name: str, path: Path):
@@ -52,28 +53,45 @@ class ModuleContractTests(unittest.TestCase):
                     self.assertIn(prereq, resolved)
                     self.assertLess(resolved.index(prereq), resolved.index(name))
 
-    def test_web_display_module_ids_match_generated_manifest(self):
-        display_block = re.search(
-            r'const MODULES_DISPLAY = \[(.*?)\];',
-            self.web_source,
-            re.S,
-        ).group(1)
-        display_ids = re.findall(r'\{\s*id:\s*"([^"]+)"', display_block)
+    def test_web_display_metadata_is_manifest_driven(self):
+        self.assertNotIn('const MODULES_DISPLAY = [', self.web_source)
+        self.assertIn('displayModulesFromManifest(appManifest)', self.web_source)
+
         explicitly_hidden = {
             'can-diag',
             'persistence-dump',
             'region-audit',
         }
-        display_only = {
-            'dtc-checker',
-        }
 
-        self.assertEqual(len(display_ids), len(set(display_ids)))
-        self.assertEqual(set(display_ids) - set(self.manifest['modules']), display_only)
         self.assertEqual(
-            set(self.manifest['modules']) - set(display_ids),
+            {
+                name
+                for name, meta in self.manifest['modules'].items()
+                if meta.get('display') is False
+            },
             explicitly_hidden,
         )
+
+        orders = []
+        for name, meta in self.manifest['modules'].items():
+            if meta.get('display') is False:
+                continue
+            with self.subTest(module=name):
+                self.assertTrue(meta.get('display_name'))
+                self.assertIn(meta.get('category'), {'system', 'gem', 'visual', 'nav', 'diag', 'net'})
+                self.assertTrue(meta.get('detail'))
+                self.assertIn(meta.get('status'), {'alpha', 'design', 'planned', 'ready', 'tested'})
+                self.assertTrue(meta.get('compatible'))
+                self.assertIsInstance(meta.get('display_order'), int)
+                orders.append(meta['display_order'])
+
+        self.assertEqual(len(orders), len(set(orders)))
+
+    def test_readme_module_count_matches_discovered_modules(self):
+        readme = README.read_text(encoding='utf-8')
+        match = re.search(r'collection of (\d+) modules', readme)
+        self.assertIsNotNone(match)
+        self.assertEqual(int(match.group(1)), len(self.modules))
 
     def test_declared_run_scripts_are_copied_for_runnable_modules(self):
         for name, meta in self.modules.items():

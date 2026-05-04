@@ -4,7 +4,11 @@
     "description": "Java game launcher for MMI3G — run games from SD card on the J9 JVM. Use SD slot 2 as your game library!",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "prereq": "gem-activator",
     "gem_path": "/games",
     "scripts": [
@@ -17,5 +21,11 @@
         "adventure - 'The Quattro Quest' Audi-themed text adventure"
     ],
     "notes": "Games run on the J9 JVM using lsd.jxe as the Java runtime (credit: romangarms for discovering this). Games output to the GEM script console via stdout. The MMI has 800x480 display, ~40x15 character console, rotary knob + 4 soft keys. SD slot 2 can be used as a dedicated game library — just create /games/<name>/game.jar + game.manifest on any FAT32 SD card. Compatible with Java 1.4/1.5 class files (no generics, no AWT/Swing).",
-    "how_to_add_games": "1. Create a folder in /games/ on your SD card. 2. Add game.jar (compiled with -target 1.4). 3. Add game.manifest with main=ClassName and name=Display Name. 4. The game will appear in GEM > /games menu."
+    "how_to_add_games": "1. Create a folder in /games/ on your SD card. 2. Add game.jar (compiled with -target 1.4). 3. Add game.manifest with main=ClassName and name=Display Name. 4. The game will appear in GEM > /games menu.",
+    "display": true,
+    "display_order": 120,
+    "display_name": "Game Loader",
+    "category": "visual",
+    "short_description": "Run Java games on the MMI's J9 JVM from SD card",
+    "detail": "Launcher module plus example games. Loads signed JARs via the built-in job framework."
 }

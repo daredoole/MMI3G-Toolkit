@@ -17,5 +17,11 @@
         "If the deploy created /mnt/nav/gemmi from nothing, restore removes it again",
         "Validated against the matching google-earth-p0824-deploy workflow on a US RNS-850."
     ],
-    "uninstall": "Use this restore card before removing helper scripts with build_sd.py --uninstall."
+    "uninstall": "Use this restore card before removing helper scripts with build_sd.py --uninstall.",
+    "display": true,
+    "display_order": 170,
+    "display_name": "P0824 GEMMI Restore",
+    "category": "system",
+    "short_description": "Restore /mnt/nav/gemmi from the backup made by P0824 GEMMI Deploy",
+    "detail": "Uses /mnt/nav/.mmi3g_toolkit/google-earth-p0824/active.env to restore the previous GEMMI tree or remove the donor tree if none existed before deploy."
 }

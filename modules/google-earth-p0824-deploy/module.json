@@ -32,5 +32,11 @@
         "web_url": "https://dspl1236.github.io/MMI3G-Toolkit/payloads/gemmi_p0824_eu_vw.zip",
         "target": "gemmi",
         "size": 9823685
-    }
+    },
+    "display": true,
+    "display_order": 160,
+    "display_name": "P0824 GEMMI Deploy",
+    "category": "system",
+    "short_description": "Deploy bundled EU VW P0824 GEMMI donor payload to /mnt/nav/gemmi",
+    "detail": "Backs up the existing /mnt/nav/gemmi tree, copies the bundled EU VW P0824 GEMMI payload from SD card root /gemmi, and adds minimal drivers.ini auth-bypass settings. Does not patch lsd.jxe or firmware."
 }

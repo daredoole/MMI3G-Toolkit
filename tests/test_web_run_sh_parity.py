@@ -115,16 +115,8 @@ class WebRunShParityTests(unittest.TestCase):
             lines.append(line.rstrip())
         return '\n'.join(lines).strip()
 
-    def test_generate_run_sh_matches_python_builder_for_representative_modules(self):
-        representative_sets = (
-            ['system-info'],
-            ['gem-activator', 'can-scanner'],
-            ['diag-tool'],
-            ['per3-reader'],
-            ['lte-setup'],
-        )
-
-        for selected in representative_sets:
+    def test_generate_run_sh_matches_python_builder_for_each_module(self):
+        for selected in ([name] for name in sorted(self.modules)):
             with self.subTest(selected=selected):
                 self.assertEqual(
                     self.normalize_run_sh(

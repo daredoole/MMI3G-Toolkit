@@ -71,39 +71,49 @@ class WebBundleFileParityTests(unittest.TestCase):
                 if path.is_file()
             }
 
-    def test_material_bundle_files_match_builder_for_representative_modules(self):
-        representative_sets = (
-            ['system-info'],
-            ['gem-activator', 'can-scanner'],
-            ['diag-tool'],
-            ['per3-reader'],
-            ['google-earth-p0824-deploy'],
-        )
+    def test_material_bundle_files_match_builder_for_web_buildable_modules(self):
+        module_sets = ([name] for name, meta in sorted(self.modules.items()) if meta.get('web_build', True))
 
-        for selected in representative_sets:
+        for selected in module_sets:
             with self.subTest(selected=selected):
-                python_files = self.build_python_sd_files(selected)
-                web_files = self.expected_web_bundle_files(selected)
-
-                # Modules with release_zip download extra binaries at build time
-                # that aren't listed in the manifest. The webapp fetches them
-                # from the release zip too, so both builders produce the same
-                # output — but the manifest-based expectation doesn't know the
-                # zip contents. Check that all manifest files are present, and
-                # allow extras from release_zip extraction.
-                has_release_zip = any(
+                has_external_payload = any(
+                    m == 'google-earth' or
                     self.manifest['modules'].get(m, {}).get('release_zip') or
                     self.manifest['modules'].get(m, {}).get('release_assets')
                     for m in selected
                 )
-                if has_release_zip:
-                    self.assertTrue(
-                        web_files.issubset(python_files),
-                        f"Manifest files missing from builder output: "
-                        f"{web_files - python_files}",
-                    )
-                else:
-                    self.assertEqual(python_files, web_files)
+                if has_external_payload:
+                    continue
+
+                python_files = self.build_python_sd_files(selected)
+                web_files = self.expected_web_bundle_files(selected)
+
+                self.assertEqual(python_files, web_files)
+
+    def test_release_payload_modules_include_manifest_files_in_builder_output(self):
+        module_sets = (
+            [name]
+            for name, meta in sorted(self.modules.items())
+            if meta.get('web_build', True)
+            and (meta.get('release_zip') or meta.get('release_assets'))
+        )
+
+        for selected in module_sets:
+            with self.subTest(selected=selected):
+                python_files = self.build_python_sd_files(selected)
+                web_files = self.expected_web_bundle_files(selected)
+
+                has_external_payload = any(
+                    self.manifest['modules'].get(m, {}).get('release_zip') or
+                    self.manifest['modules'].get(m, {}).get('release_assets')
+                    for m in selected
+                )
+                self.assertTrue(has_external_payload)
+                self.assertTrue(
+                    web_files.issubset(python_files),
+                    f"Manifest files missing from builder output: "
+                    f"{web_files - python_files}",
+                )
 
 
 if __name__ == '__main__':

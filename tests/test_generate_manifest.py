@@ -75,8 +75,17 @@ class GenerateManifestTests(unittest.TestCase):
                     {
                         'status': 'ready',
                         'description': 'artifact demo',
+                        'display_name': 'Artifact Demo',
+                        'display_order': 10,
+                        'category': 'diag',
+                        'short_description': 'short artifact demo',
+                        'detail': 'Detailed artifact demo',
+                        'primary': True,
                         'artifact': 'demo.jar',
                         'payload_dirs': [{'source': 'payload', 'target': 'payload'}],
+                        'run_script_options': [
+                            {'value': 'demo.sh', 'label': 'Demo script'},
+                        ],
                     },
                     indent=2,
                 ),
@@ -92,6 +101,16 @@ class GenerateManifestTests(unittest.TestCase):
         self.assertEqual(
             manifest['modules']['artifact-module']['payload_dirs'],
             [{'source': 'payload', 'target': 'payload'}],
+        )
+        self.assertEqual(manifest['modules']['artifact-module']['display_name'], 'Artifact Demo')
+        self.assertEqual(manifest['modules']['artifact-module']['display_order'], 10)
+        self.assertEqual(manifest['modules']['artifact-module']['category'], 'diag')
+        self.assertEqual(manifest['modules']['artifact-module']['short_description'], 'short artifact demo')
+        self.assertEqual(manifest['modules']['artifact-module']['detail'], 'Detailed artifact demo')
+        self.assertTrue(manifest['modules']['artifact-module']['primary'])
+        self.assertEqual(
+            manifest['modules']['artifact-module']['run_script_options'],
+            [{'value': 'demo.sh', 'label': 'Demo script'}],
         )
 
     def test_manifest_preserves_p0824_release_zip_web_metadata(self):

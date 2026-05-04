@@ -4,7 +4,11 @@
     "description": "Dump stored Wi-Fi hotspot passwords, Audi Connect credentials, and other stored secrets from the MMI's persistence partitions. Read-only — changes nothing on the unit.",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G", "MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G",
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "password_dump.sh",
     "script_dir": "/scripts/PasswordFinder",
@@ -22,5 +26,11 @@
         "Bluetooth pairing keys (link keys for paired phones)"
     ],
     "notes": "Inspired by the 'Password' feature in jilleb/mib2-toolbox. On MIB2 that feature extracts stored hotspot passwords. On MMI3G the persistence paths differ but similar data exists. This module does a read-only scan — it writes only to the SD card, never modifies the MMI's flash storage.",
-    "credits": "Concept from jilleb/mib2-toolbox Password screen. MMI3G-specific implementation."
+    "credits": "Concept from jilleb/mib2-toolbox Password screen. MMI3G-specific implementation.",
+    "display": true,
+    "display_order": 200,
+    "display_name": "Password Finder",
+    "category": "diag",
+    "short_description": "Dump stored Wi-Fi, Bluetooth, Audi Connect credentials",
+    "detail": "Read-only scan of /mnt/efs-persist and /mnt/persist. Inspired by jilleb/mib2-toolbox."
 }

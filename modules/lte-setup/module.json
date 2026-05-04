@@ -4,7 +4,10 @@
     "description": "Provision MMI3G+ for LTE mobile data via USB Ethernet adapter — replaces defunct internal 3G modem with external LTE router",
     "author": "dspl1236",
     "status": "ready",
-    "compatible": ["MMI3G+", "RNS-850"],
+    "compatible": [
+        "MMI3G+",
+        "RNS-850"
+    ],
     "standalone": true,
     "run_script": "lte_setup.sh",
     "script_dir": "/scripts/LTE",
@@ -18,5 +21,25 @@
         "router": "TP-Link TL-MR3020 or any router on 192.168.0.1 subnet",
         "cable": "AMI-to-USB Type A adapter cable"
     },
-    "notes": "Based on DrGER2/MMI3GP-LAN-Setup. Creates DLinkReplacesPPP flag, enables DHCP client for en5 interface, installs dhcp-up script for DNS. MMI3G High does NOT have the ASIX driver — this module is for 3G+ and RNS-850 only."
+    "notes": "Based on DrGER2/MMI3GP-LAN-Setup. Creates DLinkReplacesPPP flag, enables DHCP client for en5 interface, installs dhcp-up script for DNS. MMI3G High does NOT have the ASIX driver — this module is for 3G+ and RNS-850 only.",
+    "display": true,
+    "display_order": 60,
+    "display_name": "LTE Setup",
+    "category": "net",
+    "short_description": "USB Ethernet for LTE data + persistent root shell (port 23 + 2323)",
+    "detail": "Creates DLinkReplacesPPP flag, enables DHCP on en5, installs dhcp-up for DNS. Adds persistent root shell on port 2323 (inetd.conf) and passwordless root login on port 23 (DrGER2 shadow method). Requires ASIX-based USB Ethernet adapter + LTE router. Restore script cleanly reverts everything.",
+    "run_script_options": [
+        {
+            "value": "lte_setup.sh",
+            "label": "DHCP Fair Mode — Standard ASIX (88172/772/772A)"
+        },
+        {
+            "value": "lte_static.sh",
+            "label": "Static 172.16.42.1 — Standard ASIX adapter"
+        },
+        {
+            "value": "lte_static_772d.sh",
+            "label": "Static 172.16.42.1 — AX88772D"
+        }
+    ]
 }
